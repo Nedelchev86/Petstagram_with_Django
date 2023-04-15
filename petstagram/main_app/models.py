@@ -1,12 +1,6 @@
-from enum import unique
-from random import choices
-
 from django.db import models
 from django.core.validators import MinLengthValidator
-
-from petstagram import main_app
-from petstagram.main_app import validators
-from petstagram.main_app.validators import only_letters
+from petstagram.main_app.validators import only_letters, validate_max_size
 
 
 # Create your models here.
@@ -54,6 +48,9 @@ class Profile(models.Model):
         blank=True,
     )
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class Pet(models.Model):
 
@@ -64,11 +61,45 @@ class Pet(models.Model):
     OTHER = "Other"
     PETS = [(x, x) for x in (CAT, DOG, BUNNY, FISH, OTHER)]
 
-    name = models.CharField(max_length=30, unique=True,)
+    name = models.CharField(max_length=30,)
+
     pets_type = models.CharField(
-        max_length=max(len(x) for x, y in PETS)
+        max_length=max(len(x) for x, y in PETS),
+        choices=PETS,
     )
     date_of_birth = models.DateField(
         null=True,
         blank=True,
     )
+    user_profile = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+
+    )
+
+    def __str__(self):
+        return f"{self.name} {self.pets_type}"
+
+    class Meta:
+        unique_together = ('user_profile', 'name')
+
+
+class PetPhoto(models.Model):
+    photo = models.ImageField(
+        validators=(validate_max_size,)
+    )
+    tagged_pets = models.ManyToManyField(
+        Pet,
+        # Validate at least one Pet ( to do )
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True,
+    )
+
+    publication_date = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    likes = models.IntegerField(default=0,)
