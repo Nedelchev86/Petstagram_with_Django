@@ -51,3 +51,4 @@ def like_pet(request, pk):
     pet_photo.save()
     return redirect('photo details', pk)
 
+
