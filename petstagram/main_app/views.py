@@ -13,6 +13,7 @@ def get_profile():
 
 
 def show_home(request):
+
     context = {
         'hide_additional_nav_items': True
     }
@@ -21,6 +22,10 @@ def show_home(request):
 
 def show_dashboard(request):
     profile = get_profile()
+
+    if not profile:
+        return redirect('401')
+
     pet_photos = set(PetPhoto.objects.filter(tagged_pets__user_profile=profile))
     context = {
         'pet_photos': pet_photos,
@@ -30,9 +35,15 @@ def show_dashboard(request):
 
 def show_profile(request):
     profile = get_profile()
+    pet_photos = PetPhoto.objects.filter(tagged_pets__user_profile=profile).distinct()
+    total_images = len(pet_photos)
+    total_like_count = sum(pp.likes for pp in pet_photos)
 
     context = {
         'profile': profile,
+        'total_images': total_images,
+        'total_images_likes': total_like_count,
+
     }
     return render(request, "profile_details.html", context)
 
