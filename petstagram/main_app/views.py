@@ -9,7 +9,7 @@ def get_profile():
     profiles = Profile.objects.all()
     if profiles:
         return profiles[0]
-    return  None
+    return None
 
 
 def show_home(request):
@@ -21,7 +21,7 @@ def show_home(request):
 
 def show_dashboard(request):
     profile = get_profile()
-    pet_photos = PetPhoto.objects.filter(tagged_pets__user_profile=profile)
+    pet_photos = set(PetPhoto.objects.filter(tagged_pets__user_profile=profile))
     context = {
         'pet_photos': pet_photos,
     }
@@ -29,10 +29,25 @@ def show_dashboard(request):
 
 
 def show_profile(request):
-    return render(request, "profile_details.html")
+    profile = get_profile()
+
+    context = {
+        'profile': profile,
+    }
+    return render(request, "profile_details.html", context)
 
 
 def show_photo_details(request, pk):
-    return render(request, "photo_details.html")
+    pet_photo = PetPhoto.objects.get(pk=pk)
+    context = {
+        'pet_photo': pet_photo,
+    }
+    return render(request, "photo_details.html", context)
 
+
+def like_pet(request, pk):
+    pet_photo = PetPhoto.objects.get(pk=pk)
+    pet_photo.likes += 1
+    pet_photo.save()
+    return redirect('photo details', pk)
 

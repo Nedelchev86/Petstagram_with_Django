@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.db import models
 from django.core.validators import MinLengthValidator
@@ -80,6 +82,10 @@ class Pet(models.Model):
 
     )
 
+    @property
+    def age(self):
+        return datetime.date.today().year - self.date_of_birth.year
+
     def __str__(self):
         return f"{self.name} {self.pets_type}"
 
@@ -89,6 +95,7 @@ class Pet(models.Model):
 
 class PetPhoto(models.Model):
     photo = models.ImageField(
+        upload_to='images/',
         validators=(validate_max_size,)
     )
     tagged_pets = models.ManyToManyField(
