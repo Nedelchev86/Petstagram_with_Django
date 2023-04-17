@@ -1,5 +1,8 @@
+from django import forms
 from django.db import models
 from django.core.validators import MinLengthValidator
+from django.forms import ModelForm
+
 from petstagram.main_app.validators import only_letters, validate_max_size
 
 
@@ -103,3 +106,4 @@ class PetPhoto(models.Model):
     )
 
     likes = models.IntegerField(default=0,)
+

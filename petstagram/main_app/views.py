@@ -1,14 +1,31 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
+from petstagram.main_app.models import Profile, PetPhoto
+
 
 # Create your views here.
+def get_profile():
+    profiles = Profile.objects.all()
+    if profiles:
+        return profiles[0]
+    return  None
 
 
 def show_home(request):
-    return render(request, "home_page.html")
+    context = {
+        'hide_additional_nav_items': True
+    }
+    return render(request, "home_page.html", context)
 
 
 def show_dashboard(request):
-    return render(request, "dashboard.html")
+    profile = get_profile()
+    pet_photos = PetPhoto.objects.filter(tagged_pets__user_profile=profile)
+    context = {
+        'pet_photos': pet_photos,
+    }
+    return render(request, "dashboard.html", context)
 
 
 def show_profile(request):
@@ -17,3 +34,5 @@ def show_profile(request):
 
 def show_photo_details(request, pk):
     return render(request, "photo_details.html")
+
+
